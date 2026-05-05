@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summit — Exchange Funds for Everyone</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ed;
+    --accent: #c8f135;
+    --accent-dark: #a8d420;
+    --mid: #1a1a1a;
+    --border: rgba(245,242,237,0.12);
+    --muted: rgba(245,242,237,0.45);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: var(--font-body); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 4rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.85); backdrop-filter: blur(12px); }
+  .nav-logo { font-family: var(--font-display); font-size: 2rem; letter-spacing: 0.08em; color: var(--white); text-decoration: none; cursor: pointer; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; transition: color 0.2s; cursor: pointer; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta { background: var(--accent); color: var(--black); border: none; padding: 0.6rem 1.5rem; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .nav-cta:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 4rem 5rem; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); opacity: 0.06; pointer-events: none; }
+  .hero-bg-line { border-right: 1px solid var(--white); }
+  .hero-tag { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .hero-tag::before { content: ''; display: inline-block; width: 2rem; height: 1px; background: var(--accent); }
+  .hero-headline { font-family: var(--font-display); font-size: clamp(5rem, 12vw, 11rem); line-height: 0.92; letter-spacing: 0.02em; color: var(--white); margin-bottom: 2.5rem; }
+  .hero-headline em { font-style: normal; color: var(--accent); display: block; }
+  .hero-sub { max-width: 520px; color: var(--muted); font-size: 1.1rem; line-height: 1.7; margin-bottom: 3rem; }
+  .hero-actions { display: flex; align-items: center; gap: 2rem; }
+  .btn-primary { background: var(--accent); color: var(--black); border: none; padding: 1rem 2.5rem; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+  .btn-ghost { background: transparent; color: var(--white); border: 1px solid var(--border); padding: 1rem 2.5rem; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .btn-ghost:hover { border-color: var(--white); }
+  .hero-scroll { position: absolute; bottom: 2rem; right: 4rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--muted); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; }
+  .hero-scroll-line { width: 1px; height: 4rem; background: linear-gradient(to bottom, var(--muted), transparent); }
+
+  /* TICKER */
+  .ticker { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1rem 0; overflow: hidden; background: var(--mid); }
+  .ticker-inner { display: flex; gap: 4rem; animation: ticker 20s linear infinite; white-space: nowrap; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ticker-item { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  .ticker-item span { color: var(--accent); font-weight: 500; }
+  .ticker-dot { width: 4px; height: 4px; background: var(--border); border-radius: 50%; }
+
+  /* SECTIONS */
+  section { padding: 8rem 4rem; }
+  .section-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+  .section-label::before { content: ''; display: inline-block; width: 1.5rem; height: 1px; background: var(--accent); }
+  .section-title { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5.5rem); line-height: 0.95; letter-spacing: 0.02em; margin-bottom: 1.5rem; }
+
+  /* PROBLEM */
+  .problem { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+  .problem-right { display: flex; flex-direction: column; gap: 1.5rem; }
+  .problem-stat { border-left: 2px solid var(--accent); padding-left: 1.5rem; }
+  .problem-stat-number { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; color: var(--accent); }
+  .problem-stat-label { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+
+  /* HOW IT WORKS */
+  .how-bg { background: var(--mid); }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 4rem; border: 1px solid var(--border); }
+  .step { padding: 2.5rem 2rem; border-right: 1px solid var(--border); }
+  .step:last-child { border-right: none; }
+  .step-num { font-family: var(--font-display); font-size: 4rem; line-height: 1; color: var(--accent); opacity: 0.3; margin-bottom: 1.5rem; }
+  .step-title { font-weight: 500; font-size: 1.05rem; margin-bottom: 0.75rem; }
+  .step-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.65; }
+
+  /* COMPARE */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-top: 4rem; }
+  .compare-card { border: 1px solid var(--border); padding: 2.5rem 2rem; position: relative; }
+  .compare-card.featured { border-color: var(--accent); background: rgba(200,241,53,0.04); }
+  .compare-card-badge { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--black); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 1rem; white-space: nowrap; }
+  .compare-card-name { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .compare-card-min { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; margin-bottom: 0.25rem; }
+  .compare-card-min.accent { color: var(--accent); }
+  .compare-card-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  .compare-feature { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.85rem; font-size: 0.9rem; color: var(--muted); }
+  .compare-feature .check { color: var(--accent); flex-shrink: 0; }
+  .compare-feature .cross { color: rgba(245,242,237,0.2); flex-shrink: 0; }
+
+  /* WAITLIST */
+  .waitlist-section { background: var(--accent); color: var(--black); }
+  .waitlist-section .section-label { color: var(--black); opacity: 0.5; }
+  .waitlist-section .section-label::before { background: var(--black); }
+  .waitlist-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+  .waitlist-form { display: flex; flex-direction: column; gap: 1rem; }
+  .waitlist-input { background: rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.2); color: var(--black); padding: 1rem 1.25rem; font-family: var(--font-body); font-size: 0.95rem; outline: none; width: 100%; transition: border-color 0.2s; }
+  .waitlist-input::placeholder { color: rgba(10,10,10,0.4); }
+  .waitlist-input:focus { border-color: var(--black); }
+  .waitlist-submit { background: var(--black); color: var(--accent); border: none; padding: 1rem 2rem; font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .waitlist-submit:hover { background: #1a1a1a; }
+  .waitlist-note { font-size: 0.8rem; opacity: 0.5; }
+
+  /* FAQ */
+  .faq-list { margin-top: 4rem; }
+  .faq-item { border-top: 1px solid var(--border); padding: 2rem 0; cursor: pointer; }
+  .faq-item:last-child { border-bottom: 1px solid var(--border); }
+  .faq-q { display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; font-weight: 500; }
+  .faq-arrow { font-size: 1.2rem; color: var(--accent); transition: transform 0.3s; flex-shrink: 0; }
+  .faq-a { color: var(--muted); font-size: 0.95rem; line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding-top 0.35s; }
+  .faq-item.open .faq-a { max-height: 300px; padding-top: 1rem; }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 3rem 4rem; display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: 0.08em; color: var(--white); cursor: pointer; }
+  .footer-logo span { color: var(--accent); }
+  .footer-legal { color: var(--muted); font-size: 0.78rem; font-family: var(--font-mono); text-align: right; max-width: 460px; line-height: 1.6; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* INNER PAGES */
+  .inner-hero { padding: 12rem 4rem 6rem; border-bottom: 1px solid var(--border); }
+  .inner-content { padding: 5rem 4rem; max-width: 800px; }
+  .inner-content h2 { font-family: var(--font-display); font-size: 2.5rem; margin: 3rem 0 1rem; color: var(--white); }
+  .inner-content p { color: var(--muted); line-height: 1.8; margin-bottom: 1.25rem; }
+  .inner-content ul { list-style: none; margin-bottom: 1.25rem; }
+  .inner-content ul li { color: var(--muted); padding: 0.5rem 0; padding-left: 1.5rem; position: relative; }
+  .inner-content ul li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+
+  /* TEAM */
+  .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; padding: 4rem; }
+  .team-card { border: 1px solid var(--border); padding: 2rem; }
+  .team-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--mid); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 1.5rem; color: var(--accent); margin-bottom: 1.25rem; }
+  .team-name { font-weight: 500; font-size: 1.05rem; margin-bottom: 0.25rem; }
+  .team-role { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  .team-bio { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .hero { padding: 0 1.5rem 4rem; }
+    .hero-headline { font-size: clamp(3.5rem, 14vw, 6rem); }
+    .problem { grid-template-columns: 1fr; gap: 3rem; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .step { border-bottom: 1px solid var(--border); }
+    .compare-grid { grid-template-columns: 1fr; }
+    .waitlist-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .team-grid { grid-template-columns: 1fr 1fr; padding: 2rem; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem 1.5rem; }
+    .footer-legal { text-align: center; }
+    .inner-hero { padding: 8rem 1.5rem 3rem; }
+    .inner-content { padding: 3rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('how')">How It Works</a></li>
+    <li><a onclick="showPage('about')">About</a></li>
+    <li><a onclick="showPage('team')">Team</a></li>
+    <li><a onclick="showPage('legal')">Legal</a></li>
+  </ul>
+  <button class="nav-cta" onclick="scrollToWaitlist()">Join Waitlist</button>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+
+  <div class="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-tag">Exchange Funds — Reimagined</div>
+    <h1 class="hero-headline">
+      YOUR STOCK.<br>
+      YOUR TERMS.
+      <em>$10K MINIMUM.</em>
+    </h1>
+    <p class="hero-sub">Exchange funds have been reserved for Goldman Sachs clients with $1M+ for decades. We changed that. Any accredited investor can now diversify their concentrated stock position — tax-free — starting at $10,000.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollToWaitlist()">Reserve Your Spot</button>
+      <button class="btn-ghost" onclick="showPage('how')">How It Works →</button>
+    </div>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      Scroll
+    </div>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+
+  <section>
+    <div class="problem">
+      <div>
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">A CENTURY-OLD PRODUCT. KEPT FROM YOU.</h2>
+        <p style="color: var(--muted); line-height: 1.75; margin-top: 1.5rem;">Exchange funds have existed since the 1930s. Goldman Sachs, Morgan Stanley, and a handful of elite private banks offer them — but only to clients investing $1 million or more. If you're a tech employee, startup founder, or early investor with concentrated stock, you've been left out. Until now.</p>
+      </div>
+      <div class="problem-right">
+        <div class="problem-stat">
+          <div class="problem-stat-number">$750K</div>
+          <div class="problem-stat-label">Average capital gains deferred per investor in modern exchange funds</div>
+        </div>
+        <div class="problem-stat">
+          <div class="problem-stat-number">85%</div>
+          <div class="problem-stat-label">Of Nasdaq-100 stocks underperform the index over a 7-year period</div>
+        </div>
+        <div class="problem-stat">
+          <div class="problem-stat-number">$1M+</div>
+          <div class="problem-stat-label">Minimum required at Goldman Sachs or Morgan Stanley to access this product</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-bg">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">FOUR STEPS.<br>ZERO TAX BILL.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Contribute Your Stock</div>
+        <p class="step-desc">Transfer your concentrated shares — as little as $10,000 — into the Summit Feeder Fund. No selling, no taxable event.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">We Aggregate</div>
+        <p class="step-desc">Your shares are pooled with other investors into a single institutional contribution that enters the exchange fund at close.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Instant Diversification</div>
+        <p class="step-desc">Your position is now benchmarked to the Nasdaq-100 or S&P 500. One stock becomes hundreds — overnight.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Exit After 7 Years</div>
+        <p class="step-desc">Redeem a diversified basket of stocks. Taxes deferred until you sell. Your original cost basis carries through.</p>
+      </div>
+    </div>
+    <div style="margin-top: 2.5rem;">
+      <button class="btn-ghost" onclick="showPage('how')">Full Breakdown →</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">The Difference</div>
+    <h2 class="section-title">BUILT FOR THE<br>OTHER 99%.</h2>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-card-name">Goldman / Morgan Stanley</div>
+        <div class="compare-card-min">$1M+</div>
+        <div class="compare-card-sub">Minimum contribution</div>
+        <div class="compare-feature"><span class="cross">✕</span> Requires private wealth relationship</div>
+        <div class="compare-feature"><span class="cross">✕</span> 1.5%+ fees with front-end loads</div>
+        <div class="compare-feature"><span class="cross">✕</span> Quarterly close cycles</div>
+        <div class="compare-feature"><span class="cross">✕</span> Opaque portfolio composition</div>
+        <div class="compare-feature"><span class="cross">✕</span> Paper-based enrollment process</div>
+      </div>
+      <div class="compare-card featured">
+        <div class="compare-card-badge">Summit</div>
+        <div class="compare-card-name" style="margin-top: 0.75rem;">Summit Exchange Fund</div>
+        <div class="compare-card-min accent">$10K</div>
+        <div class="compare-card-sub">Minimum contribution</div>
+        <div class="compare-feature"><span class="check">✓</span> Open to all accredited investors</div>
+        <div class="compare-feature"><span class="check">✓</span> 0.65% all-in, no hidden fees</div>
+        <div class="compare-feature"><span class="check">✓</span> Monthly close cycles</div>
+        <div class="compare-feature"><span class="check">✓</span> Real-time portfolio transparency</div>
+        <div class="compare-feature"><span class="check">✓</span> Digital enrollment in 15 minutes</div>
+      </div>
+      <div class="compare-card">
+        <div class="compare-card-name">Cache</div>
+        <div class="compare-card-min">$100K</div>
+        <div class="compare-card-sub">Minimum contribution</div>
+        <div class="compare-feature"><span class="check">✓</span> Accredited investors welcome</div>
+        <div class="compare-feature"><span class="cross">✕</span> 0.35–0.85% fees</div>
+        <div class="compare-feature"><span class="check">✓</span> Monthly closes</div>
+        <div class="compare-feature"><span class="check">✓</span> Digital platform</div>
+        <div class="compare-feature"><span class="cross">✕</span> No feeder for smaller positions</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="waitlist-section" id="waitlist">
+    <div class="waitlist-inner">
+      <div>
+        <div class="section-label">Early Access</div>
+        <h2 class="section-title" style="color: var(--black);">JOIN THE<br>WAITLIST.</h2>
+        <p style="color: rgba(10,10,10,0.55); margin-top: 1rem; max-width: 380px; font-size: 0.95rem;">Our first close is limited. Reserve your spot and get priority access — zero fees for the first year for founding members.</p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: rgba(10,10,10,0.6);"><span style="color: var(--black); font-weight: 500;">→</span> No commitment required</div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: rgba(10,10,10,0.6);"><span style="color: var(--black); font-weight: 500;">→</span> Founding member fee waiver</div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: rgba(10,10,10,0.6);"><span style="color: var(--black); font-weight: 500;">→</span> First close expected Q4 2026</div>
+        </div>
+      </div>
+      <div class="waitlist-form" id="waitlistForm">
+        <input class="waitlist-input" type="text" placeholder="Full name" id="wName">
+        <input class="waitlist-input" type="email" placeholder="Email address" id="wEmail">
+        <input class="waitlist-input" type="text" placeholder="Stock ticker (e.g. NVDA, AAPL)" id="wStock">
+        <select class="waitlist-input" id="wAmount" style="cursor: pointer;">
+          <option value="" disabled selected>Approximate position size</option>
+          <option>$10,000 – $50,000</option>
+          <option>$50,000 – $100,000</option>
+          <option>$100,000 – $500,000</option>
+          <option>$500,000+</option>
+        </select>
+        <button class="waitlist-submit" onclick="submitWaitlist()">Reserve My Spot →</button>
+        <p class="waitlist-note">By submitting, you confirm you are an accredited investor. This is not an offer to sell securities.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Questions</div>
+    <h2 class="section-title">THE ONES<br>YOU'LL ASK.</h2>
+    <div class="faq-list" id="faqList"></div>
+  </section>
+
+  <footer>
+    <div class="footer-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+    <div class="footer-legal">Summit Advisors, LLC is a registered investment adviser. Exchange fund participation is limited to accredited investors. Past performance is not indicative of future results. This site is for informational purposes only and does not constitute an offer to sell or solicitation of an offer to buy any securities.</div>
+  </footer>
+
+</div>
+
+<!-- HOW IT WORKS PAGE -->
+<div class="page" id="page-how">
+  <div class="inner-hero">
+    <div class="section-label">Process</div>
+    <h1 class="section-title">HOW IT<br>WORKS.</h1>
+  </div>
+  <div class="inner-content">
+    <p>Summit uses a two-tier structure — a feeder fund that aggregates smaller investor positions, which then contributes as a single institutional participant into the exchange fund. This is how we unlock access at $10K minimums.</p>
+    <h2>The Feeder Structure</h2>
+    <p>Traditional exchange funds require large individual contributions because the per-investor operational cost (legal, accounting, K-1 issuance, capital account tracking) is roughly fixed regardless of position size. Our feeder fund pools contributions across many smaller investors and enters the exchange fund as a single LP — absorbing that fixed cost collectively.</p>
+    <h2>Tax Treatment</h2>
+    <p>Contributions to a properly structured exchange fund are not considered a taxable event under IRC §721. Your contributed shares enter the fund at their original cost basis. After seven years, you withdraw a diversified basket of stocks — and pay no taxes until you eventually sell those holdings.</p>
+    <ul>
+      <li>No capital gains tax at contribution</li>
+      <li>Original cost basis preserved through the fund</li>
+      <li>Taxes deferred until final sale of redeemed shares</li>
+      <li>Estate planning benefits: step-up in basis at death</li>
+    </ul>
+    <h2>The 20% Real Estate Requirement</h2>
+    <p>IRS rules require that at least 20% of exchange fund assets be held in qualifying real property. We partner with an institutional real estate manager to deploy this sleeve — ensuring IRS compliance while maintaining institutional-grade quality of the non-equity holdings.</p>
+    <h2>Monthly Closes</h2>
+    <p>We target a monthly close cycle. You commit your shares, we verify eligibility and benchmark fit, and at close your position enters the fund. The entire digital enrollment process takes approximately 15 minutes.</p>
+    <h2>The 7-Year Lock</h2>
+    <p>Tax law requires a minimum 7-year holding period to withdraw a diversified basket. If you exit before 7 years, you receive your original stock back (not a diversified basket) and no taxable event has occurred. After 7 years, you may choose to redeem or remain invested.</p>
+    <h2>Custody & Safety</h2>
+    <p>All assets are custodied at a major institutional bank, independent of Summit. Independent fund administration and annual audits provide an additional layer of oversight. SIPC protection applies to brokerage accounts up to $500,000.</p>
+  </div>
+  <footer>
+    <div class="footer-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+    <div class="footer-legal">For informational purposes only. Not an offer to sell securities. Accredited investors only.</div>
+  </footer>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <div class="inner-hero">
+    <div class="section-label">Our Mission</div>
+    <h1 class="section-title">BUILT TO<br>BREAK THE<br>BARRIER.</h1>
+  </div>
+  <div class="inner-content">
+    <p>Exchange funds have been one of the most powerful wealth management tools in existence since the 1930s. For most of that time, they've been available exclusively to clients of Goldman Sachs and Morgan Stanley with $1 million or more to invest.</p>
+    <p>We think that's wrong. The concentrated stock problem affects millions of tech employees, startup founders, and early-stage investors who don't meet those minimums. Their only options have been: sell and pay a massive tax bill, or hold and hope.</p>
+    <p>Summit was founded by a team with deep institutional experience in exchange fund management, combined with the conviction that the structural barriers to access are operational, not fundamental. Our feeder fund model solves the operational problem — letting any accredited investor participate starting at $10,000.</p>
+    <h2>Our Principles</h2>
+    <ul>
+      <li>Transparency in portfolio composition and fee structure</li>
+      <li>Institutional-grade infrastructure, democratized access</li>
+      <li>No sales loads, no conflicted incentives</li>
+      <li>Client assets always held independently, never commingled with operating funds</li>
+      <li>Plain-English disclosure — no financial product obfuscation</li>
+    </ul>
+    <h2>Institutional Backing</h2>
+    <p>Summit is backed by investors who understand both the product and the market opportunity. Our team brings direct experience running exchange fund products at bulge-bracket institutions — we know this product from the inside.</p>
+  </div>
+  <footer>
+    <div class="footer-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+    <div class="footer-legal">For informational purposes only. Not an offer to sell securities. Accredited investors only.</div>
+  </footer>
+</div>
+
+<!-- TEAM PAGE -->
+<div class="page" id="page-team">
+  <div class="inner-hero">
+    <div class="section-label">The Team</div>
+    <h1 class="section-title">BUILT BY<br>INSIDERS.</h1>
+  </div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">JR</div>
+      <div class="team-name">James R. [Founder]</div>
+      <div class="team-role">CEO & Co-Founder</div>
+      <div class="team-bio">Former VP at Goldman Sachs, Exchange Fund Products. 10+ years structuring and managing exchange funds for ultra-high-net-worth clients. Saw the access problem firsthand and decided to fix it.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">SK</div>
+      <div class="team-name">Sarah K. [Placeholder]</div>
+      <div class="team-role">CTO & Co-Founder</div>
+      <div class="team-bio">Previously Staff Engineer at a leading fintech brokerage. Built core portfolio management infrastructure handling $20B+ in assets. Expert in brokerage API integration and in-kind transfer systems.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">MC</div>
+      <div class="team-name">Michael C. [Placeholder]</div>
+      <div class="team-role">Chief Compliance Officer</div>
+      <div class="team-bio">15 years in securities compliance at registered investment advisers and broker-dealers. Specialist in partnership fund structures, Reg D offerings, and SEC examination management.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">AL</div>
+      <div class="team-name">Amy L. [Placeholder]</div>
+      <div class="team-role">Head of Tax & Partnerships</div>
+      <div class="team-bio">Former Big 4 partnership tax lead. Deep expertise in IRC §721 exchange fund structuring, two-tier K-1 allocation, and cost basis preservation across complex fund structures.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">DM</div>
+      <div class="team-name">David M. [Placeholder]</div>
+      <div class="team-role">Portfolio Manager</div>
+      <div class="team-bio">Index-focused equity PM with prior experience at a quantitative asset manager. Leads benchmark correlation strategy, ETF rebalancing, and stock acceptance methodology.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">KP</div>
+      <div class="team-name">Kavya P. [Placeholder]</div>
+      <div class="team-role">Head of Wealth Partnerships</div>
+      <div class="team-bio">Former RIA relationship manager covering 200+ independent advisory firms. Builds and manages Summit's RIA distribution channel and financial advisor partnerships.</div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+    <div class="footer-legal">For informational purposes only. Not an offer to sell securities. Accredited investors only.</div>
+  </footer>
+</div>
+
+<!-- LEGAL PAGE -->
+<div class="page" id="page-legal">
+  <div class="inner-hero">
+    <div class="section-label">Disclosures</div>
+    <h1 class="section-title">LEGAL &<br>DISCLOSURES.</h1>
+  </div>
+  <div class="inner-content">
+    <h2>Regulatory Status</h2>
+    <p>Summit Advisors, LLC is a registered investment adviser with the U.S. Securities and Exchange Commission. Registration does not imply a certain level of skill or training.</p>
+    <h2>Eligibility</h2>
+    <p>Participation in Summit Exchange Funds is limited to accredited investors as defined under Rule 501 of Regulation D of the Securities Act of 1933. An individual qualifies as an accredited investor if they have:</p>
+    <ul>
+      <li>Net worth exceeding $1 million (excluding primary residence), individually or jointly with spouse</li>
+      <li>Annual income exceeding $200,000 (or $300,000 jointly) in each of the two most recent years</li>
+      <li>Certain professional certifications (Series 7, 65, or 82 license holders)</li>
+    </ul>
+    <h2>Not an Offer</h2>
+    <p>Nothing on this website constitutes an offer to sell or a solicitation of an offer to buy any securities. Any such offer will be made only by means of a definitive Private Placement Memorandum (PPM) and related subscription documents.</p>
+    <h2>Tax Disclosure</h2>
+    <p>This website contains general information about exchange fund tax treatment. Tax outcomes depend on individual circumstances. Prospective investors should consult their own tax advisors regarding the tax consequences of any investment. Summit does not provide tax advice.</p>
+    <h2>Risk Factors</h2>
+    <ul>
+      <li>Exchange funds involve a 7-year lock-up period for diversified redemption</li>
+      <li>Fund performance is not guaranteed and may underperform the benchmark</li>
+      <li>The feeder fund structure involves two layers of fees and operational complexity</li>
+      <li>Real estate sleeve values may fluctuate independently of equity markets</li>
+      <li>Regulatory changes to IRC §721 could affect fund tax treatment</li>
+      <li>Summit is an early-stage company with limited operating history</li>
+    </ul>
+    <h2>Forward-Looking Statements</h2>
+    <p>This website may contain forward-looking statements. These statements involve known and unknown risks and uncertainties that may cause actual results to differ materially from those anticipated.</p>
+  </div>
+  <footer>
+    <div class="footer-logo" onclick="showPage('home')">SUMM<span>IT</span></div>
+    <div class="footer-legal">Summit Advisors, LLC. All rights reserved. © 2026</div>
+  </footer>
+</div>
+
+<script>
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function scrollToWaitlist() {
+    showPage('home');
+    setTimeout(() => {
+      document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  }
+
+  // Hero grid lines
+  const heroBg = document.getElementById('heroBg');
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement('div');
+    d.className = 'hero-bg-line';
+    heroBg.appendChild(d);
+  }
+
+  // Ticker
+  const tickerItems = [
+    { label: 'Nasdaq-100 Fund', val: 'Open' },
+    { label: 'S&P 500 Fund', val: 'Coming Q3' },
+    { label: 'Min. Contribution', val: '$10,000' },
+    { label: 'Close Frequency', val: 'Monthly' },
+    { label: 'Mgmt. Fee', val: '0.65%' },
+    { label: 'Custodian', val: 'BNY Mellon' },
+    { label: 'Waitlist', val: 'Now Open' },
+    { label: 'Tax Event', val: 'None at Entry' },
+  ];
+  const full = [...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems];
+  const inner = document.getElementById('tickerInner');
+  full.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'ticker-item';
+    div.innerHTML = `${item.label} <span>${item.val}</span>`;
+    inner.appendChild(div);
+    if (i < full.length - 1) {
+      const dot = document.createElement('div');
+      dot.className = 'ticker-dot';
+      inner.appendChild(dot);
+    }
+  });
+
+  // FAQ
+  const faqs = [
+    { q: "What is an exchange fund?", a: "An exchange fund is a partnership that pools concentrated stock positions from multiple investors. By contributing stock to the fund under IRC §721, investors can diversify their holdings without triggering a taxable sale. After seven years, you can redeem a diversified basket of stocks and defer taxes until you eventually sell." },
+    { q: "What does '$10,000 minimum' actually mean?", a: "You can contribute as little as $10,000 worth of a single stock into our Feeder Fund. Summit aggregates these smaller contributions and enters the main Exchange Fund as a single institutional participant. This is what makes the lower minimum possible — the operational cost is shared across all feeder investors." },
+    { q: "Do I need to be an accredited investor?", a: "Yes. SEC regulations require all participants in exchange fund offerings to be accredited investors. This means a net worth exceeding $1 million (excluding primary residence), or annual income exceeding $200,000 individually ($300,000 jointly) for the past two years. Certain professional license holders also qualify." },
+    { q: "Which stocks do you accept?", a: "We accept publicly traded U.S. equities that meet our benchmark fit criteria. Each contributed stock is assessed on its sector alignment, market cap, and factor exposure relative to the Nasdaq-100. Stocks that don't fit the benchmark or lack sufficient liquidity may not be accepted." },
+    { q: "What happens if I need my money before 7 years?", a: "If you exit before the 7-year threshold, you receive your original contributed stock back — not a diversified basket. No taxable event has occurred. After 7 years, you may redeem a diversified basket of stocks, with taxes deferred until you sell those holdings." },
+    { q: "How are my assets protected?", a: "All contributed assets are held in custody at a major institutional bank, completely independent of Summit's operating entity. Independent fund administration, annual audits, and SIPC protection (up to $500,000 per account) provide multiple layers of oversight and protection." }
+  ];
+
+  const faqList = document.getElementById('faqList');
+  faqs.forEach(faq => {
+    const item = document.createElement('div');
+    item.className = 'faq-item';
+    item.innerHTML = `<div class="faq-q">${faq.q} <span class="faq-arrow">+</span></div><div class="faq-a">${faq.a}</div>`;
+    item.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+    faqList.appendChild(item);
+  });
+
+  // Waitlist submit
+  function submitWaitlist() {
+    const name = document.getElementById('wName').value;
+    const email = document.getElementById('wEmail').value;
+    if (!name || !email) { alert('Please enter your name and email.'); return; }
+    document.getElementById('waitlistForm').innerHTML = `
+      <div style="border: 1px solid rgba(0,0,0,0.15); padding: 2.5rem 2rem; text-align: center;">
+        <div style="font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--black); margin-bottom: 0.5rem;">YOU'RE IN.</div>
+        <p style="color: rgba(10,10,10,0.55); font-size: 0.95rem;">We'll be in touch with next steps before our first close.</p>
+      </div>`;
+  }
+</script>
+</body>
+</html>
